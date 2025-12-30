@@ -5,13 +5,13 @@
 A feature-rich Project Dashboard Web App built with Next.js, featuring real-time updates, advanced filtering, role-based access control, and beautiful pastel UI design.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
-![TypeScript] (https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-38B2AC?style=flat-square&logo=tailwind-css)
 ![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2-purple?style=flat-square&logo=redux)
 
 ## 🌐 Live Demo
 
-[View Live Demo](https://your-vercel-url.vercel.app)
+[View Live Demo](https://project-dashboard-flame.vercel.app/)
 
 ---
 
@@ -216,13 +216,19 @@ npm start
 
 ### Bonus Features
 - [x] Charts with Recharts (4 chart types)
+    <img width="1077" height="687" alt="image" src="https://github.com/user-attachments/assets/190bc462-bbab-4876-8a6b-460e3b97e527" />
+
 - [x] Beautiful pastel UI design
 - [x] Glassmorphism effects
+      <img width="773" height="786" alt="image" src="https://github.com/user-attachments/assets/2676adf4-5544-4256-a28e-2b38d00a05b7" />
+
 - [x] Smooth animations
 - [x] KPI dashboard
+    <img width="782" height="345" alt="image" src="https://github.com/user-attachments/assets/68da6a82-f0fe-4aae-95f2-1c7b21e5dfb1" />
+
 - [ ] PWA support (optional)
 - [ ] WebSocket real-time updates (optional)
-- [ ] Form validation with Zod (optional)
+- [x] Form validation with Zod (optional)
 
 ---
 
@@ -233,6 +239,9 @@ Target Lighthouse scores:
 - Accessibility: 90+
 - Best Practices: 90+
 - SEO: 90+
+  <img width="1674" height="697" alt="Screenshot 2025-12-30 150332" src="https://github.com/user-attachments/assets/22d72995-0311-4c93-a36d-3f09162d2766" />
+
+<img width="856" height="627" alt="image" src="https://github.com/user-attachments/assets/dcca1e73-1a90-4734-adc6-8a1f1f69ae0b" />
 
 ---
 
@@ -246,17 +255,11 @@ Target Lighthouse scores:
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
 ## 👨‍💻 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
+- GitHub: [Hager Seyam](https://github.com/Hagerseyam)
+- LinkedIn: [Hager Seyam]([https://linkedin.com/in/yourprofile](https://www.linkedin.com/in/hager-seyam/))
 
 ---
 
