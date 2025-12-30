@@ -1,4 +1,4 @@
-# project-dashboard
+<img width="1121" height="686" alt="image" src="https://github.com/user-attachments/assets/0f503213-29d6-4cf8-8833-bf651a1f3eb1" /># project-dashboard
 
 # 📊 Project Dashboard
 
@@ -30,6 +30,8 @@ A feature-rich Project Dashboard Web App built with Next.js, featuring real-time
 
 ### 📋 Dashboard Page
 - **Project listing** with comprehensive data display
+<img width="1121" height="686" alt="image" src="https://github.com/user-attachments/assets/e182dcb8-1e35-48b3-ab16-28ca3674e340" />
+
 - **Pagination** for handling large datasets
 - **Multi-column sorting** (Name, Status, Date, Progress, Budget)
 - **Advanced filtering** by status, priority, and assigned user
@@ -52,6 +54,9 @@ A feature-rich Project Dashboard Web App built with Next.js, featuring real-time
   - Status: Pending, In Progress, Completed
   - Priority: High, Medium, Low
   - Assigned User: Filter by team member
+
+<img width="1117" height="87" alt="Screenshot 2025-12-30 152811" src="https://github.com/user-attachments/assets/4307528b-34cc-4031-9e54-f9811b58e74b" />
+
 - **Filter reset** functionality
 - **Memoized filtering** for optimal performance
 
