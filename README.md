@@ -271,3 +271,4 @@ Target Lighthouse scores:
 - [TailwindCSS](https://tailwindcss.com)
 - [Recharts](https://recharts.org)
 - [Redux Toolkit](https://redux-toolkit.js.org)
+
