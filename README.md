@@ -1,4 +1,3 @@
-<img width="1121" height="686" alt="image" src="https://github.com/user-attachments/assets/0f503213-29d6-4cf8-8833-bf651a1f3eb1" /># project-dashboard
 
 # 📊 Project Dashboard
 
