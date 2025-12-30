@@ -263,7 +263,7 @@ Target Lighthouse scores:
 
 **Your Name**
 - GitHub: [Hager Seyam](https://github.com/Hagerseyam)
-- LinkedIn: [Hager Seyam]([https://linkedin.com/in/yourprofile](https://www.linkedin.com/in/hager-seyam/))
+- LinkedIn: [Hager Seyam](https://www.linkedin.com/in/hager-seyam/)
 
 ---
 
