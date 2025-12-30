@@ -31,32 +31,35 @@ export default function LoginPage() {
     { username: "manager1", password: "123", role: "ProjectManager" },
     { username: "dev1", password: "123", role: "Developer" },
   ];
+const onSubmit = async (data: LoginFormInputs) => {
+  // Call your API login endpoint
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: data.username,
+      password: data.password,
+    }),
+  });
 
-  const onSubmit = (data: LoginFormInputs) => {
-  const user = mockUsers.find(
-    u => u.username === data.username && u.password === data.password
-  );
-  if (!user) {
-    toast.error("Invalid username or password");
+  const json = await res.json();
+
+  if (!res.ok) {
+    toast.error(json.error);
     return;
   }
-// the cookies will expire in 7 daysss
-  const maxAge = 60 * 60 * 24 * 7;
-  document.cookie = `token=mock-token; path=/; max-age=${maxAge}`;
-  document.cookie = `username=${user.username}; path=/; max-age=${maxAge}`;
-  document.cookie = `role=${user.role}; path=/; max-age=${maxAge}`;
 
- dispatch(
-  login({
-    token: "mock-token",
-    name: user.username,
-    role: user.role,
-  })
-);
+  // Dispatch to Redux
+  dispatch(
+    login({
+      token: json.token,
+      name: json.name,
+      role: json.role,
+    })
+  );
 
-
-  toast.success(`Welcome, ${user.username}!`);
-  router.push("/");
+  toast.success(`Welcome, ${json.name}!`);
+  router.push("/dashboard");
 };
 
 

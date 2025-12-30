@@ -1,12 +1,9 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import useSWR from "swr";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import ProgressChart from "./ProgressChart";
-import RadarChartExample from "./RadarChartExample";
-import StatusPieChart from "./StatusPieChart";
 import { mockProjects , Project } from "../app/utils/mockProjects"; // adjust the path if needed
 import { 
   MagnifyingGlassIcon, 
@@ -15,16 +12,18 @@ import {
   UserIcon, 
   ArrowPathIcon 
 } from "@heroicons/react/24/outline";
-import JointLineScatterChart from "./BubbleChart";
 
 
 import { useRouter } from "next/navigation";
+import ProgressChart from "./ProgressChart";
+import StatusPieChart from "./StatusPieChart";
+import RadarChartExample from "./RadarChartExample";
+import JointLineScatterChart from "./BubbleChart";
 
 const fetcher = async () => {
   await new Promise((res) => setTimeout(res, 300));
   return mockProjects;
 };
-
 
 export default function ProjectTable() {
 
@@ -44,7 +43,7 @@ const { data: projects, error, isLoading } = useSWR<Project[]>(
   const [search, setSearch] = useState<string>("");
   const router = useRouter();
 
-  
+
     useEffect(() => {
       if (projects) {
         setEditableProjects(projects);
@@ -59,7 +58,6 @@ const { data: projects, error, isLoading } = useSWR<Project[]>(
       );
     }
   };
-
 
 
 // Filter with search
@@ -77,6 +75,24 @@ const filteredProjects = useMemo(() => {
 }, [editableProjects, statusFilter, priorityFilter, assignedFilter, search]);
 
 
+    const memoizedProgressChart = useMemo(
+    () => <ProgressChart projects={filteredProjects} />,
+    [filteredProjects]
+  );
+  
+  const memoizedStatusPieChart = useMemo(
+    () => <StatusPieChart projects={filteredProjects} />,
+    [filteredProjects]
+  );
+  const memoizedRadarChartExample = useMemo(
+    () => <RadarChartExample projects={filteredProjects} />,
+    [filteredProjects]
+  );
+  const memoizedJointLineScatterChart = useMemo(
+    () => <JointLineScatterChart projects={filteredProjects} />,
+    [filteredProjects]
+  );
+  
 
 
   // Sort
@@ -105,6 +121,14 @@ const filteredProjects = useMemo(() => {
 
 
 
+    // KPIs
+  const totalProjects = filteredProjects.length;
+  const completedProjects = filteredProjects.filter(p => p.status === "Completed").length;
+  const pendingProjects = filteredProjects.filter(p => p.status === "Pending").length;
+  const averageProgress =
+    filteredProjects.reduce((sum, p) => sum + p.progress, 0) / (filteredProjects.length || 1);
+
+
 return (
   <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl shadow-lg p-8 min-h-screen">
   {/* Header */}
@@ -115,7 +139,28 @@ return (
 
 </div>
 
-    {/* --- Charts Section --- */}
+      {/* --- KPIs --- */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-blue-50/80 backdrop-blur-sm border border-blue-100 rounded-2xl shadow-sm p-6 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+          <h3 className="text-blue-600/80 text-xs font-bold uppercase tracking-wider">Total Projects</h3>
+          <p className="text-3xl text-gray-800 font-extrabold mt-2">{totalProjects}</p>
+        </div>
+        <div className="bg-emerald-50/80 backdrop-blur-sm border border-emerald-100 rounded-2xl shadow-sm p-6 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+          <h3 className="text-emerald-600/80 text-xs font-bold uppercase tracking-wider">Completed Projects</h3>
+          <p className="text-3xl text-gray-800 font-extrabold mt-2">{completedProjects}</p>
+        </div>
+        <div className="bg-amber-50/80 backdrop-blur-sm border border-amber-100 rounded-2xl shadow-sm p-6 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+          <h3 className="text-amber-600/80 text-xs font-bold uppercase tracking-wider">Pending Projects</h3>
+          <p className="text-3xl text-gray-800 font-extrabold mt-2">{pendingProjects}</p>
+        </div>
+        <div className="bg-violet-50/80 backdrop-blur-sm border border-violet-100 rounded-2xl shadow-sm p-6 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+          <h3 className="text-violet-600/80 text-xs font-bold uppercase tracking-wider">Average Progress</h3>
+          <p className="text-3xl text-gray-800 font-extrabold mt-2">{averageProgress.toFixed(1)}%</p>
+        </div>
+      </div>
+
+
+  {/* --- Charts Section --- */}
     {filteredProjects.length > 0 && (
     <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
 
@@ -124,7 +169,7 @@ return (
         <h3 className="text-lg font-bold mb-4 text-gray-700 border-l-4 border-teal-300 pl-3 group-hover:text-teal-600 transition-colors">
             Project Progress
         </h3>
-        <ProgressChart projects={filteredProjects} />
+        {memoizedProgressChart}
         <p className="text-sm text-gray-400 mt-4 font-medium">
             Shows the overall completion percentage of each project based on current progress.
         </p>
@@ -136,7 +181,7 @@ return (
             Status Distribution
         </h3>
         <div className="flex justify-center flex-grow items-center">
-            <StatusPieChart projects={filteredProjects} />
+            {memoizedStatusPieChart}
         </div>
         <p className="text-sm text-gray-400 mt-4 font-medium">
             Displays the proportion of projects in Pending, In Progress, and Completed status.
@@ -148,7 +193,7 @@ return (
         <h3 className="text-lg font-bold mb-6 text-gray-700 border-l-4 border-blue-300 pl-3 group-hover:text-blue-600 transition-colors">
             Project Status
         </h3>
-        <RadarChartExample projects={[]} />
+        {memoizedRadarChartExample}
         <p className="text-sm text-gray-400 mt-4 font-medium">
             Compares multiple project metrics such as progress, priority, and resource allocation in a radar format.
         </p>
@@ -159,7 +204,7 @@ return (
         <h3 className="text-lg font-bold mb-4 text-gray-700 border-l-4 border-purple-300 pl-3 group-hover:text-purple-600 transition-colors">
             Joint Line Scatter Chart
         </h3>
-        <JointLineScatterChart projects={filteredProjects} />
+      {memoizedJointLineScatterChart}
         <p className="text-sm text-gray-400 mt-4 font-medium">
             Shows correlations between project metrics such as budget, progress, and team performance.
         </p>
@@ -167,6 +212,7 @@ return (
 
     </div>
     )}
+
 
 
 
