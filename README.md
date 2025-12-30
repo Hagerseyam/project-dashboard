@@ -229,9 +229,6 @@ npm start
 - [x] Smooth animations
 - [x] KPI dashboard
     <img width="782" height="345" alt="image" src="https://github.com/user-attachments/assets/68da6a82-f0fe-4aae-95f2-1c7b21e5dfb1" />
-
-- [ ] PWA support (optional)
-- [ ] WebSocket real-time updates (optional)
 - [x] Form validation with Zod (optional)
 
 ---
@@ -242,7 +239,7 @@ Target Lighthouse scores:
 - Performance: 90+
 - Accessibility: 90+
 - Best Practices: 90+
-- SEO: 90+
+- SEO: 80+
   <img width="1674" height="697" alt="Screenshot 2025-12-30 150332" src="https://github.com/user-attachments/assets/22d72995-0311-4c93-a36d-3f09162d2766" />
 
 <img width="856" height="627" alt="image" src="https://github.com/user-attachments/assets/dcca1e73-1a90-4734-adc6-8a1f1f69ae0b" />
