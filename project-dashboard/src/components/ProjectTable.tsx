@@ -4,7 +4,6 @@ import React, { useState, useMemo, useEffect } from "react";
 import useSWR from "swr";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import ProjectSkeleton from "./ProjectSkeleton";
 import ProgressChart from "./ProgressChart";
 import RadarChartExample from "./RadarChartExample";
 import StatusPieChart from "./StatusPieChart";
@@ -16,29 +15,10 @@ import {
   UserIcon, 
   ArrowPathIcon 
 } from "@heroicons/react/24/outline";
-import BubbleChart from "./BubbleChart";
 import JointLineScatterChart from "./BubbleChart";
 
 
-// type Project = {
-//   id: number;
-//   name: string;
-//   status: "Pending" | "In Progress" | "Completed" | string;
-//   priority: "High" | "Medium" | "Low" | string;
-//   assignedTo: string; // username or role
-//   startDate: string;
-//   endDate: string;
-//   progress: number;
-//   budget: number;
-// };
-
-
-// const mockProjects: Project[] = [
-//   { id: 1, name: "Website Redesign", status: "In Progress", priority: "High", assignedTo: "Developer", startDate: "2025-12-01", endDate: "2025-12-31", progress: 45, budget: 5000 },
-//   { id: 2, name: "Mobile App", status: "Pending", priority: "Medium", assignedTo: "ProjectManager", startDate: "2025-12-10", endDate: "2026-01-20", progress: 0, budget: 12000 },
-//   { id: 3, name: "Marketing Campaign", status: "Completed", priority: "Low", assignedTo: "Admin", startDate: "2025-11-01", endDate: "2025-11-30", progress: 100, budget: 3000 },
-//   { id: 4, name: "Backend Refactor", status: "In Progress", priority: "High", assignedTo: "Developer", startDate: "2025-12-05", endDate: "2025-12-25", progress: 60, budget: 8000 },
-// ];
+import { useRouter } from "next/navigation";
 
 const fetcher = async () => {
   await new Promise((res) => setTimeout(res, 300));
@@ -48,17 +28,21 @@ const fetcher = async () => {
 
 export default function ProjectTable() {
 
-  const { data: projects, error, isLoading } = useSWR<Project[]>("projects", fetcher);
+const { data: projects, error, isLoading } = useSWR<Project[]>(
+  "projects",
+  fetcher
+);
   const role = useSelector((state: RootState) => state.auth.role);
   const [editableProjects, setEditableProjects] = useState<Project[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const projectsPerPage = 2;
+  const projectsPerPage = 10;
   const [sortField, setSortField] = useState<keyof Project | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [priorityFilter, setPriorityFilter] = useState<string>("");
   const [assignedFilter, setAssignedFilter] = useState<string>("");
   const [search, setSearch] = useState<string>("");
+  const router = useRouter();
 
   
     useEffect(() => {
@@ -78,16 +62,19 @@ export default function ProjectTable() {
 
 
 
-  // Filter
+// Filter with search
 const filteredProjects = useMemo(() => {
   return editableProjects.filter(project => {
     const statusMatch = statusFilter ? project.status === statusFilter : true;
     const priorityMatch = priorityFilter ? project.priority === priorityFilter : true;
     const assignedMatch = assignedFilter ? project.assignedTo === assignedFilter : true;
-    return statusMatch && priorityMatch && assignedMatch;
-  });
-}, [editableProjects, statusFilter, priorityFilter, assignedFilter]);
+    const searchMatch = search
+      ? project.name.toLowerCase().includes(search.toLowerCase())
+      : true;
 
+    return statusMatch && priorityMatch && assignedMatch && searchMatch;
+  });
+}, [editableProjects, statusFilter, priorityFilter, assignedFilter, search]);
 
 
 
@@ -116,41 +103,80 @@ const filteredProjects = useMemo(() => {
     return sortedProjects.slice(start, start + projectsPerPage);
   }, [sortedProjects, currentPage]);
 
-  const handleSort = (field: keyof Project) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortOrder("asc");
-    }
-  };
-
-
-<tbody>
-  {isLoading
-    ? Array.from({ length: 4 }).map((_, i) => <ProjectSkeleton key={i} />)
-    : paginatedProjects.map(project => (
-        <tr key={project.id} className="border-t hover:bg-gray-50 transition">
-          {/* Your existing project row code here */}
-        </tr>
-      ))}
-</tbody>
 
 
 return (
-  <div className="bg-white rounded-xl shadow-md p-6">
+  <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl shadow-lg p-8 min-h-screen">
   {/* Header */}
-  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-    <h2 className="text-lg font-semibold text-gray-500">
+  <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <h2 className="text-2xl font-bold text-gray-700 border-l-4 border-indigo-300 pl-3">
       Projects
     </h2>
 
+</div>
+
+    {/* --- Charts Section --- */}
+    {filteredProjects.length > 0 && (
+    <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        {/* Progress Chart Card */}
+        <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-sm border border-white/50 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+        <h3 className="text-lg font-bold mb-4 text-gray-700 border-l-4 border-teal-300 pl-3 group-hover:text-teal-600 transition-colors">
+            Project Progress
+        </h3>
+        <ProgressChart projects={filteredProjects} />
+        <p className="text-sm text-gray-400 mt-4 font-medium">
+            Shows the overall completion percentage of each project based on current progress.
+        </p>
+        </div>
+
+        {/* Status Pie Chart Card */}
+        <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-sm border border-white/50 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col group">
+        <h3 className="text-lg font-bold mb-6 text-gray-700 border-l-4 border-yellow-300 pl-3 group-hover:text-yellow-600 transition-colors">
+            Status Distribution
+        </h3>
+        <div className="flex justify-center flex-grow items-center">
+            <StatusPieChart projects={filteredProjects} />
+        </div>
+        <p className="text-sm text-gray-400 mt-4 font-medium">
+            Displays the proportion of projects in Pending, In Progress, and Completed status.
+        </p>
+        </div>
+
+        {/* Radar Chart Card */}
+        <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-sm border border-white/50 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col group">
+        <h3 className="text-lg font-bold mb-6 text-gray-700 border-l-4 border-blue-300 pl-3 group-hover:text-blue-600 transition-colors">
+            Project Status
+        </h3>
+        <RadarChartExample projects={[]} />
+        <p className="text-sm text-gray-400 mt-4 font-medium">
+            Compares multiple project metrics such as progress, priority, and resource allocation in a radar format.
+        </p>
+        </div>
+
+        {/* Bubble Chart Card */}
+        <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-sm border border-white/50 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-x-auto group">
+        <h3 className="text-lg font-bold mb-4 text-gray-700 border-l-4 border-purple-300 pl-3 group-hover:text-purple-600 transition-colors">
+            Joint Line Scatter Chart
+        </h3>
+        <JointLineScatterChart projects={filteredProjects} />
+        <p className="text-sm text-gray-400 mt-4 font-medium">
+            Shows correlations between project metrics such as budget, progress, and team performance.
+        </p>
+        </div>
+
+    </div>
+    )}
+
+
+
+
   {/* Controls */}
-    <div className="bg-gray-100 rounded-xl p-4 mb-4 flex flex-wrap items-center gap-4 shadow-sm">
+    <div className="bg-white/60 backdrop-blur-md rounded-2xl p-5 mb-6 flex flex-wrap items-center gap-4 shadow-sm border border-white/50">
       
       {/* Search Bar */}
-      <div className="flex items-center bg-white rounded-md px-3 py-2 flex-1 min-w-[200px] focus-within:ring-2 focus-within:ring-blue-500 transition">
-        <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 mr-2" />
+      <div className="flex text-gray-700 items-center bg-white/80 backdrop-blur-sm rounded-xl px-4 py-3 flex-1 min-w-[200px] focus-within:ring-2 focus-within:ring-indigo-300 focus-within:border-indigo-200 transition-all duration-300 border border-indigo-100 hover:shadow-md">
+        <MagnifyingGlassIcon className="w-5 h-5 text-indigo-400 mr-3" />
         <input
           type="text"
           placeholder="Search projects..."
@@ -159,17 +185,17 @@ return (
             setSearch(e.target.value);
             setCurrentPage(1);
           }}
-          className="w-full text-sm outline-none"
+          className="w-full text-sm outline-none bg-transparent placeholder-gray-400"
         />
       </div>
 
       {/* Status Filter */}
-      <div className="flex items-center bg-white rounded-md px-3 py-2 min-w-[150px]">
-        <ClipboardDocumentListIcon className="w-5 h-5 text-gray-400 mr-2" />
+      <div className="flex text-gray-700 items-center bg-emerald-50/80 backdrop-blur-sm rounded-xl px-4 py-3 min-w-[150px] border border-emerald-100 hover:shadow-md transition-all duration-300">
+        <ClipboardDocumentListIcon className="w-5 h-5 text-emerald-500 mr-3" />
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="w-full text-sm outline-none bg-transparent"
+          className="w-full text-sm outline-none bg-transparent cursor-pointer"
         >
           <option value="">All Statuses</option>
           <option value="Pending">Pending</option>
@@ -179,12 +205,12 @@ return (
       </div>
 
       {/* Priority Filter */}
-      <div className="flex items-center bg-white rounded-md px-3 py-2 min-w-[150px]">
-        <FlagIcon className="w-5 h-5 text-gray-400 mr-2" />
+      <div className="flex text-gray-700 items-center bg-amber-50/80 backdrop-blur-sm rounded-xl px-4 py-3 min-w-[150px] border border-amber-100 hover:shadow-md transition-all duration-300">
+        <FlagIcon className="w-5 h-5 text-amber-500 mr-3" />
         <select
           value={priorityFilter}
           onChange={e => setPriorityFilter(e.target.value)}
-          className="w-full text-sm outline-none bg-transparent"
+          className="w-full text-sm outline-none bg-transparent cursor-pointer"
         >
           <option value="">All Priorities</option>
           <option value="High">High</option>
@@ -194,12 +220,12 @@ return (
       </div>
 
       {/* Assigned User Filter */}
-      <div className="flex items-center bg-white rounded-md px-3 py-2 min-w-[150px]">
-        <UserIcon className="w-5 h-5 text-gray-400 mr-2" />
+      <div className="flex text-gray-700 items-center bg-violet-50/80 backdrop-blur-sm rounded-xl px-4 py-3 min-w-[150px] border border-violet-100 hover:shadow-md transition-all duration-300">
+        <UserIcon className="w-5 h-5 text-violet-500 mr-3" />
         <select
           value={assignedFilter}
           onChange={e => setAssignedFilter(e.target.value)}
-          className="w-full text-sm outline-none bg-transparent"
+          className="w-full text-gray-700 text-sm outline-none bg-transparent cursor-pointer"
         >
           <option value="">All Users</option>
           <option value="Developer">Developer</option>
@@ -216,72 +242,28 @@ return (
           setAssignedFilter("");
           setSearch("");
         }}
-        className="flex items-center bg-white rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition"
+        className="flex items-center bg-gradient-to-r from-indigo-100 to-purple-100 rounded-xl px-4 py-3 text-sm font-semibold text-indigo-700 hover:from-indigo-200 hover:to-purple-200 hover:shadow-md transition-all duration-300 border border-indigo-100"
       >
         <ArrowPathIcon className="w-5 h-5 mr-2" />
         Reset Filters
       </button>
     </div>
 
-</div>
-
-{/* --- Charts Section --- */}
-{filteredProjects.length > 0 && (
-  <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-    {/* Progress Chart Card */}
-    <div className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg hover:bg-gray-50 transition">
-      <h3 className="text-md font-semibold mb-2 text-gray-700 border-l-4 border-teal-400 pl-2">
-        Project Progress
-      </h3>
-      <ProgressChart projects={filteredProjects} />
-    </div>
-
-      {/* Status Pie Chart Card */}
-    <div className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg hover:bg-gray-50 transition flex flex-col">
-      <h3 className="text-md font-semibold mb-4 text-gray-700 border-l-4 border-yellow-400 pl-2">
-        Status Distribution
-      </h3>
-      <div className="flex justify-center">
-        <StatusPieChart projects={filteredProjects} />
-      </div>
-    </div>
-
-
-    {/* Radar Chart Card */}
-    <div className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg hover:bg-gray-50 transition flex flex-col">
-      
-      <h3 className="text-md font-semibold mb-4 text-gray-700 border-l-4 border-blue-400 pl-2">
-        Project Status
-      </h3>
-      <RadarChartExample />
-    </div>
-
-
-    {/* Bubble Chart Card */}
-    <div className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg hover:bg-gray-50 transition overflow-x-auto">
-      <h3 className="text-md font-semibold mb-2 text-gray-700 border-l-4 border-purple-400 pl-2">
-      Joint Line Scatter Chart   
-      </h3>
-
-      <JointLineScatterChart projects={filteredProjects} />
-    </div>
-  </div>
-)}
-
 
 {/* Table */}
-<div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+<div className="overflow-x-auto rounded-2xl border border-white/50 bg-white/70 backdrop-blur-md shadow-sm">
   <table className="min-w-full text-sm">
-    <thead className="bg-gray-100 text-gray-700">
+    <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 text-gray-700">
       <tr>
-        <th className="px-4 py-3 text-left font-medium">Name</th>
-        <th className="px-4 py-3 text-left font-medium">Status</th>
-        <th className="px-4 py-3 text-left font-medium">Priority</th>
-        <th className="px-4 py-3 text-left font-medium">Assigned To</th>
-        <th className="px-4 py-3 text-left font-medium">Start Date</th>
-        <th className="px-4 py-3 text-left font-medium">End Date</th>
-        <th className="px-4 py-3 text-left font-medium">Progress</th>
-        <th className="px-4 py-3 text-left font-medium">Budget</th>
+        <th className="px-5 py-4 text-left font-bold text-xs uppercase tracking-wider text-indigo-600">Name</th>
+        <th className="px-5 py-4 text-left font-bold text-xs uppercase tracking-wider text-indigo-600">Status</th>
+        <th className="px-5 py-4 text-left font-bold text-xs uppercase tracking-wider text-indigo-600">Priority</th>
+        <th className="px-5 py-4 text-left font-bold text-xs uppercase tracking-wider text-indigo-600">Assigned To</th>
+        <th className="px-5 py-4 text-left font-bold text-xs uppercase tracking-wider text-indigo-600">Start Date</th>
+        <th className="px-5 py-4 text-left font-bold text-xs uppercase tracking-wider text-indigo-600">End Date</th>
+        <th className="px-5 py-4 text-left font-bold text-xs uppercase tracking-wider text-indigo-600">Progress</th>
+        <th className="px-5 py-4 text-left font-bold text-xs uppercase tracking-wider text-indigo-600">Budget</th>
+        <th className="px-5 py-4 text-left font-bold text-xs uppercase tracking-wider text-indigo-600">Actions</th>
       </tr>
     </thead>
 
@@ -289,21 +271,17 @@ return (
       {paginatedProjects.map((project) => (
         <tr
           key={project.id}
-          className="border-t hover:bg-gray-50 transition">
+          className="border-t border-indigo-50 hover:bg-indigo-50/50 transition-all duration-200">
           {/* Name */}
-          <td className="px-4 py-3 font-medium text-gray-800">
-            {project.name}
-          </td>
+          <td className="px-5 py-4 font-semibold text-gray-700">{project.name}</td>
 
           {/* Status */}
-          <td className="px-4 py-3">
+          <td className="px-5 py-4">
             {(role === "Admin" || role === "ProjectManager") ? (
               <select
                 value={project.status}
-                onChange={(e) =>
-                  handleEdit(project.id, "status", e.target.value)
-                }
-                className="border px-2 py-1 rounded text-sm"
+                onChange={(e) => handleEdit(project.id, "status", e.target.value)}
+                className="border border-indigo-100 px-3 py-1.5 rounded-lg text-sm text-gray-700 bg-white/80 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200"
               >
                 <option value="Pending">Pending</option>
                 <option value="In Progress">In Progress</option>
@@ -311,11 +289,10 @@ return (
               </select>
             ) : (
               <span
-                className={`px-2 py-1 rounded-full text-xs font-medium
-                  ${project.status === "Completed" && "bg-green-100 text-green-700"}
-                  ${project.status === "In Progress" && "bg-blue-100 text-blue-700"}
-                  ${project.status === "Pending" && "bg-yellow-100 text-yellow-700"}
-                `}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm
+                  ${project.status === "Completed" && "bg-emerald-100 text-emerald-600 border border-emerald-200"}
+                  ${project.status === "In Progress" && "bg-blue-100 text-blue-600 border border-blue-200"}
+                  ${project.status === "Pending" && "bg-amber-100 text-amber-600 border border-amber-200"}`}
               >
                 {project.status}
               </span>
@@ -323,29 +300,25 @@ return (
           </td>
 
           {/* Priority */}
-          <td className="px-4 py-3">
+          <td className="px-5 py-4">
             <span
-              className={`px-2 py-1 rounded-full text-xs font-medium
-                ${project.priority === "High" && "bg-red-100 text-red-700"}
-                ${project.priority === "Medium" && "bg-yellow-100 text-yellow-700"}
-                ${project.priority === "Low" && "bg-green-100 text-green-700"}
-              `}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm
+                ${project.priority === "High" && "bg-rose-100 text-rose-600 border border-rose-200"}
+                ${project.priority === "Medium" && "bg-amber-100 text-amber-600 border border-amber-200"}
+                ${project.priority === "Low" && "bg-emerald-100 text-emerald-600 border border-emerald-200"}`}
             >
               {project.priority}
             </span>
           </td>
 
           {/* Assigned User */}
-          <td className="px-4 py-3 text-gray-700">
-            {project.assignedTo}
-          </td>
+          <td className="px-5 py-4 text-gray-600 font-medium">{project.assignedTo}</td>
 
           {/* Dates */}
-          <td className="px-4 py-3 text-gray-600">{project.startDate}</td>
-          <td className="px-4 py-3 text-gray-600">{project.endDate}</td>
-
+          <td className="px-5 py-4 text-gray-500">{project.startDate}</td>
+          <td className="px-5 py-4 text-gray-500">{project.endDate}</td>
           {/* Progress */}
-          <td className="px-4 py-3">
+          <td className="px-5 py-4">
             {(role === "Admin" || role === "ProjectManager") ? (
               <>
                 <input
@@ -353,58 +326,56 @@ return (
                   min={0}
                   max={100}
                   value={project.progress}
-                  onChange={(e) =>
-                    handleEdit(project.id, "progress", Number(e.target.value))
-                  }
-                  className="w-full"
+                  onChange={(e) => handleEdit(project.id, "progress", Number(e.target.value))}
+                  className="w-full accent-indigo-500"
                 />
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                <div className="w-full bg-gray-100 rounded-full h-2.5 mt-1.5 overflow-hidden">
                   <div
-                    className={`h-2 rounded-full transition-all
+                    className={`h-2.5 rounded-full transition-all duration-300
                       ${project.progress < 50
-                        ? "bg-red-500"
+                        ? "bg-gradient-to-r from-rose-400 to-rose-500"
                         : project.progress < 80
-                        ? "bg-yellow-500"
-                        : "bg-green-500"}
-                    `}
+                        ? "bg-gradient-to-r from-amber-400 to-amber-500"
+                        : "bg-gradient-to-r from-emerald-400 to-emerald-500"}`}
                     style={{ width: `${project.progress}%` }}
                   />
                 </div>
-                <span className="text-xs text-gray-600">
-                  {project.progress}%
-                </span>
+                <span className="text-xs text-gray-600 font-medium mt-1">{project.progress}%</span>
               </>
             ) : (
-              <>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="h-2 bg-blue-500 rounded-full"
-                    style={{ width: `${project.progress}%` }}
-                  />
-                </div>
-                <span className="text-xs text-gray-600">
-                  {project.progress}%
-                </span>
-              </>
+              <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                <div
+                  className="h-2.5 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full transition-all duration-300"
+                  style={{ width: `${project.progress}%` }}
+                />
+              </div>
             )}
           </td>
 
           {/* Budget */}
-          <td className="px-4 py-3">
+          <td className="px-5 py-4">
             {role === "Admin" ? (
               <input
                 type="number"
                 value={project.budget}
-                onChange={(e) =>
-                  handleEdit(project.id, "budget", Number(e.target.value))
-                }
-                className="border px-2 py-1 w-24 rounded text-sm"
+                onChange={(e) => handleEdit(project.id, "budget", Number(e.target.value))}
+                className="border border-indigo-100 px-3 py-1.5 w-28 rounded-lg text-sm text-gray-700 bg-white/80 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200"
               />
             ) : (
-              <span className="font-medium text-gray-800">
-                ${project.budget.toLocaleString()}
-              </span>
+              <span className="font-semibold text-gray-700">${project.budget.toLocaleString()}</span>
             )}
+          </td>
+
+
+          {/* Actions: View More */}
+          <td className="px-5 py-4">
+        <button
+  onClick={() => router.push(`/projects/${project.id}`)}
+  className="px-3 py-1.5 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition"
+>
+  View More
+</button>
+
           </td>
         </tr>
       ))}
@@ -415,25 +386,25 @@ return (
 
 
     {/* Pagination */}
-    <div className="flex items-center justify-between mt-4 text-sm">
+    <div className="flex items-center justify-between mt-6 text-sm">
       <button
         onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
         disabled={currentPage === 1}
-        className="px-3 py-2 border rounded-md disabled:opacity-50 hover:bg-gray-100"
+        className="px-5 py-2.5 text-indigo-700 bg-white/80 backdrop-blur-sm border border-indigo-100 rounded-xl disabled:opacity-40 hover:bg-indigo-50 hover:shadow-md transition-all duration-300 font-medium"
       >
-        Previous
+        ← Previous
       </button>
 
-      <span className="text-gray-600">
-        Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+      <span className="text-gray-600 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/50">
+        Page <strong className="text-indigo-600">{currentPage}</strong> of <strong className="text-indigo-600">{totalPages}</strong>
       </span>
 
       <button
         onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
         disabled={currentPage === totalPages}
-        className="px-3 py-2 border rounded-md disabled:opacity-50 hover:bg-gray-100"
+        className="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl disabled:opacity-40 hover:from-indigo-600 hover:to-purple-600 hover:shadow-md transition-all duration-300 font-medium"
       >
-        Next
+        Next →
       </button>
     </div>
   </div>

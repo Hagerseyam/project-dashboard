@@ -2,8 +2,7 @@
     "use client";
 
     
-    
-    // components/ProjectSkeleton.tsx
+    // while lpading to show this skeleton
     export default function ProjectSkeleton() {
     return (
         <tr className="border-t animate-pulse">

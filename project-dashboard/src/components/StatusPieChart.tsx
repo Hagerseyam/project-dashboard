@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { Project } from "../app/utils/mockProjects";
 
-// Transparent colors (matching your previous PieChart)
+// Transparent colors 
 const COLORS = ["rgba(251, 191, 36, 0.9)", "rgba(59, 130, 246, 0.9)", "rgba(16, 185, 129, 0.9)"];
 const STATUS = ["Pending", "In Progress", "Completed"];
 
@@ -82,7 +82,7 @@ const StatusPieChart: React.FC<StatusPieChartProps> = ({ projects }) => {
   return (
     <div className="w-full h-64 bg-white rounded-xl shadow-md justify-center p-4 align-center ">
       <h3 className="text-md font-semibold mb-2 text-gray-700">Project Status</h3>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height={200}>
         <PieChart>
   
           <Pie

@@ -10,23 +10,38 @@ import {
   PolarGrid,
   ResponsiveContainer,
 } from "recharts";
+import { Project } from "../app/utils/mockProjects"; // adjust path
 
-const data = [
-  { subject: "Pending", value: 30 },
-  { subject: "In Progress", value: 50 },
-  { subject: "Completed", value: 20 },
-];
+interface RadarChartExampleProps {
+  projects: Project[];
+}
 
-const COLORS = ["#FBBF24", "#3B82F6", "#10B981"];
+const RadarChartExample: React.FC<RadarChartExampleProps> = ({ projects }) => {
+  // Convert projects data to the format for the radar chart
+  const data = [
+    {
+      subject: "Pending",
+      value: projects.filter(p => p.status === "Pending").length,
+    },
+    {
+      subject: "In Progress",
+      value: projects.filter(p => p.status === "In Progress").length,
+    },
+    {
+      subject: "Completed",
+      value: projects.filter(p => p.status === "Completed").length,
+    },
+  ];
 
-const RadarChartExample: React.FC = () => {
+  const COLORS = ["#FBBF24", "#3B82F6", "#10B981"];
+
   return (
     <div className="w-full h-[300px]">
-      <ResponsiveContainer>
+      <ResponsiveContainer height={250}>
         <RadarChart data={data}>
           <PolarGrid />
           <PolarAngleAxis dataKey="subject" />
-          <PolarRadiusAxis domain={[0, 60]} />
+          <PolarRadiusAxis domain={[0, Math.max(...data.map(d => d.value)) + 5]} />
 
           {data.map((entry, index) => (
             <Radar

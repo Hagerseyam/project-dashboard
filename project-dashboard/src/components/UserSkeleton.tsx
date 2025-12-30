@@ -1,4 +1,4 @@
-// components/UserSkeleton.tsx
+// to show while loading user data
 "use client";
 
 export default function UserSkeleton() {

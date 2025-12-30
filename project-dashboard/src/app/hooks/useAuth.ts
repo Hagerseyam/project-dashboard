@@ -1,4 +1,3 @@
-// src/app/hooks/useAuth.ts
 "use client";
 
 import { useEffect } from "react";

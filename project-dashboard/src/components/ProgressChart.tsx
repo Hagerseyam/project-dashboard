@@ -15,9 +15,9 @@ export default function ProjectProgressChart({ projects }: Props) {
   }));
 
   return (
-    <div className="w-full h-74 bg-white p-7 rounded-xl shadow-md">
+    <div className="w-full h-72 bg-white p-7 rounded-xl shadow-md">
       <h3 className="text-lg font-semibold mb-2 text-gray-700">Project Progress</h3>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height={210}>
         <BarChart data={data} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
           <XAxis dataKey="name" tick={{ fontSize: 12 }} />
           <YAxis tick={{ fontSize: 12 }} />
