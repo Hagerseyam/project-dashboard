@@ -10,7 +10,8 @@ A feature-rich Project Dashboard Web App built with Next.js, featuring real-time
 
 ## 🌐 Live Demo
 
-[View Live Demo]([https://project-dashboard-flame.vercel.app/])
+[View Live Demo]    
+[https://project-dashboard-flame.vercel.app/]
 
 ---
 
