@@ -188,9 +188,9 @@ npm start
 
 | Role | Username | Password |
 |------|----------|----------|
-| Admin | admin | admin123 |
-| Project Manager | manager | manager123 |
-| Developer | developer | dev123 |
+| Admin | admin1 | 123 |
+| Project Manager1 | manager1 | 123 |
+| Developer | dev1 | 123 |
 
 ---
 
